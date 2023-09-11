@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Main.unity
+    guid: 6c24cff5a3a6b774da66b3bb9bfa1167
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 7b94ea0808a73af4da898d78dbf88819
+  - enabled: 1
+    path: Assets/Scenes/NineDragon.unity
+    guid: 7927d40d3eb4ed94fad5d26ac146a53f
+  - enabled: 1
+    path: Assets/Scenes/Tichu_4p.unity
+    guid: b003ef6df211b6c4b897a442c5edae72
+  m_configObjects: {}

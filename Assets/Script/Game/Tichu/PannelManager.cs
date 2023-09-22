@@ -75,7 +75,7 @@ public class PannelManager : MonoBehaviour
     public void SetupDragon(int score)
     {
         ResetPannel(false);
-        if (submitManager.GetSubmitPlayer() == TichuPlayerManager.GetPlayerOwn())
+        if (submitManager.GetSubmitPlayer() == PlayerManager.GetPlayerOwn())
         {
             ActiveSendDragonArea(true);
             this.score = score;
@@ -83,7 +83,7 @@ public class PannelManager : MonoBehaviour
     }
     public void SendDragon(int index)//1 : ¿ÞÂÊ 3 : ¿À¸¥ÂÊ
     {
-        int receivePlayer = TichuPlayerManager.GetPlayerWithDirection(index).Index;
+        int receivePlayer = PlayerManager.GetPlayerWithDirection(index).Index;
         gameManager.TrySendDragon(receivePlayer, score);
     }
 }

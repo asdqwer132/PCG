@@ -8,11 +8,12 @@ public class TurnManager : MonoBehaviour
     protected Player currentPlayer;
 
     public int GetCurrentPlayer() { return currentPlayer.Index; }
-    public bool IsMyTurn() { return turn == TichuPlayerManager.GetPlayerOwn().Index; }
+    public bool IsMyTurn() { return turn == PlayerManager.GetPlayerOwn().Index; }
+    public virtual void SetStartTurn(int value) { turn = value; }
     public virtual void NextTurn()
     {
         if (turn > 0) turn--;
-        else turn = TichuPlayerManager.MaxPlayer - 1;
-        currentPlayer = TichuPlayerManager.GetAllPlayerWithTurn()[turn];
+        else turn = PlayerManager.MaxPlayer - 1;
+        currentPlayer = PlayerManager.GetAllPlayerWithTurn()[turn];
     }
 }

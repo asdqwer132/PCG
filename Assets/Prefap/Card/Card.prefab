@@ -68,7 +68,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -95055109, guid: 4004dc2f5b5fb2549a2caa3eaf3e23bd, type: 3}
+  m_Sprite: {fileID: -64711544, guid: 89242a58f271e7e4e891f6ea6a3cf2d2, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -122,9 +122,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Card, Assembly-CSharp
-        m_MethodName: SelectCard
+      - m_Target: {fileID: 1482994316066219896, guid: 39ed260f72d5f5043985adc655ac23f8, type: 3}
+        m_TargetAssemblyTypeName: UISoundManager, Assembly-CSharp
+        m_MethodName: CardSelect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -146,9 +146,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af5ee37d2ab69b74385f911cd5746c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardInfo:
+    cardType: 
+    number: 0
   cardFrame: {fileID: 7937454349243278486}
-  cardTypeLogo: {fileID: 0}
-  number: {fileID: 0}
 --- !u!114 &6115677934357395898
 MonoBehaviour:
   m_ObjectHideFlags: 0

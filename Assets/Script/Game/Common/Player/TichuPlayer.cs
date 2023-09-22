@@ -11,7 +11,7 @@ public class TichuPlayer : Player
     public int SendCard { get => sendCard; set => sendCard = value; }
     public List<CardReciever> RecieveCard { get => recieveCard; set => recieveCard = value; }
 
-    public bool IsAllSwap() { return sendCard >= TichuPlayerManager.MaxPlayer - 1 && recieveCard.Count >= TichuPlayerManager.MaxPlayer - 1; }
+    public bool IsAllSwap() { return sendCard >= PlayerManager.MaxPlayer - 1 && recieveCard.Count >= PlayerManager.MaxPlayer - 1; }
     public void TryUseCardWithSwap(List<CardInfo> cardInfos)
     {
         PV.RPC("UseCardWithSwap", RpcTarget.All);
@@ -36,39 +36,13 @@ public class TichuPlayer : Player
         }
     }
     [PunRPC]
-    void ReceivieCard(string card, int playerIndex)
-    {
-        recieveCard.Add(new CardReciever(SerializeManager.Deserialize<List<CardInfo>>(card)[0], playerIndex));
-    }
-    [PunRPC]
-    void SetTeam(string newTeam)
-    {
-        Team Steam = (Team)Enum.Parse(typeof(Team), newTeam);
-        team = Steam;
-    }
-    [PunRPC]
-    void UseCard(string cardInfos)
-    {
-        List<CardInfo> useCards = SerializeManager.Deserialize<List<CardInfo>>(cardInfos);
-        foreach (CardInfo card in useCards)
-        {
-            handCards.RemoveAt(handCards.FindIndex(x => x.number == card.number && x.cardType == card.cardType));
-        }
-    }
-    [PunRPC]
-    void GetCard(string cardInfos)
-    {
-        List<CardInfo> useCards = SerializeManager.Deserialize<List<CardInfo>>(cardInfos);
-        foreach (CardInfo card in useCards)
-        {
-            handCards.Add(card);
-        }
-        handCards.Sort((x, y) => x.cardType.CompareTo(y.cardType));
-        handCards.Sort((x, y) => x.number.CompareTo(y.number));
-    }
-    [PunRPC]
-    void ResetCard()
-    {
-        handCards = new List<CardInfo>();
-    }
+    void ReceivieCard(string card, int playerIndex) { recieveCard.Add(new CardReciever(SerializeManager.Deserialize<List<CardInfo>>(card)[0], playerIndex)); }
+    //[PunRPC]
+    //new void SetTeam(string newTeam) { base.SetTeam(newTeam); }
+    //[PunRPC]
+    //new void UseCard(string cardInfos) { base.GetCard(cardInfos); }
+    //[PunRPC]
+    //new void GetCard(string cardInfos) { base.GetCard(cardInfos); }
+    //[PunRPC]
+    //new void ResetCard() { base.ResetCard(); }
 }

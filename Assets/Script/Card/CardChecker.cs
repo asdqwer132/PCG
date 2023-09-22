@@ -53,8 +53,8 @@ public class CardChecker : MonoBehaviour
     }
     void SetText()
     {
-        Genealogy genealogy = GenealogyChekcer.CheckGenealogy(selectedCards);
+        Genealogy genealogy = GenealogyChekcer.Instance.CheckGenealogy(selectedCards);
         submit.SetTextByGenealogy(genealogy, submitManager.CheckCanSubmit(genealogy));
-        if (submitManager.IsBoom(genealogy)) submit.ForceSetBtn();
+        if (submitManager.IsBoom(selectedCards)) submit.ForceSetBtn();
     }
 }

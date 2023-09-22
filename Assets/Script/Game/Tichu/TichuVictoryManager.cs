@@ -8,23 +8,28 @@ public class TichuVictoryManager : Popup, IVictoryManagerInteface
     [SerializeField] Transform scoreTransform;
     [SerializeField] GameObject scores;
     [SerializeField] TextMeshProUGUI title;
-    public bool IsEnd() { return scoreManager.GetTotalScore(Team.red) >= 1000 || scoreManager.GetTotalScore(Team.blue) >= 1000; }
+    [SerializeField] NetworkManager networkManager;
+    public bool IsEnd() { return scoreManager.GetTotalScore(Team.Red) >= 1000 || scoreManager.GetTotalScore(Team.Blue) >= 1000; }
     public void GameOver()
     {
         Toggle();
         scores.SetActive(true);
         scores.transform.SetParent(scoreTransform);
         scores.transform.localPosition = Vector3.zero;
-        if (scoreManager.GetTotalScore(Team.red) >= 1000)
+        if (scoreManager.GetTotalScore(Team.Red) >= 1000)
         {
-            if (scoreManager.GetTotalScore(Team.blue) >= scoreManager.GetTotalScore(Team.red)) SetWiner(Team.blue);
-            else SetWiner(Team.red);
+            if (scoreManager.GetTotalScore(Team.Blue) >= scoreManager.GetTotalScore(Team.Red)) SetWiner(Team.Blue);
+            else SetWiner(Team.Red);
         }
-        else SetWiner(Team.blue);
+        else SetWiner(Team.Blue);
     }
     void SetWiner(Team team)
     {
         title.color = ColorSelector.TeamColor(team.ToString());
-        title.text = team == Team.red ? "Red WIn!" : "Blue Win!";
+        title.text = team == Team.Red ? "Red WIn!" : "Blue Win!";
+    }
+    public void EndGame()
+    {
+        networkManager.Disconnect();
     }
 }

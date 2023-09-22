@@ -8,6 +8,7 @@ using TMPro;
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
 
+    [SerializeField] SceneMover sceneMover;
     #region Private Serializable Fields
 
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
@@ -34,14 +35,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.AutomaticallySyncScene = true;
     }
-    private void Start()
-    {
-        Connect();
-    }
     #endregion
 
 
-    #region Public Methods
+    #region Public Methods 
+    //¿¬°á ²÷±â
+    public void Disconnect() => PhotonNetwork.Disconnect();
     public void Connect()
     {
         isConnecting = true;
@@ -75,21 +74,25 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
     public override void OnConnectedToMaster()
     {
-        Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
+        //Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
         if (isConnecting)
         {
             // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
             PhotonNetwork.JoinRandomRoom();
         }
     }
-
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+    }
     public override void OnDisconnected(DisconnectCause cause)
     {
+        sceneMover.MoveScene("Main");
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
+        //Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
 
         // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
@@ -101,7 +104,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         login.SetActive(false);
         waitManager.TrySetNickname();
-        Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+        //Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
     }
     #endregion
 }

@@ -7,7 +7,7 @@ public class TeamManager : MonoBehaviour
     static TeamManager instance;
 
     public static TeamManager Instance { get => instance; }
-    [SerializeField] Team[] teams = new Team[4] { Team.random, Team.random, Team.random, Team.random };
+    [SerializeField] Team[] teams = new Team[5] { Team.random, Team.random, Team.random, Team.random, Team.random };
     public Team GetTeam(int index)
     {
         return teams[index];
@@ -23,14 +23,15 @@ public class TeamManager : MonoBehaviour
         int blueTeam = 0;
         foreach(Team team in teams)
         {
-            if (team == Team.blue) blueTeam++;
-            if (team == Team.red) redTeam++;
+            if (team == Team.Blue) blueTeam++;
+            if (team == Team.Red) redTeam++;
         }
         if (redTeam + blueTeam == maxPlayer && redTeam == blueTeam && redTeam != 0) return;//ÆÀÀÇ ±ÕÇüÀÌ ¸ÂÀ½
-        teams[0] = Team.red;
-        teams[1] = Team.blue;
-        teams[2] = Team.red;
-        teams[3] = Team.blue;
+        teams[0] = Team.Red;
+        teams[1] = Team.Blue;
+        teams[2] = Team.Red;
+        teams[3] = Team.Blue;
+        teams[4] = Team.Red;
     }
     void Awake()
     {

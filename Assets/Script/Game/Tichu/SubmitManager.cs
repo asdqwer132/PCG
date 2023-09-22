@@ -16,8 +16,8 @@ public class SubmitManager : MonoBehaviour
     public bool IsFirst() { return submitedGenealogy.length == 0; }
     public void Submit(List<CardInfo> selectedCards, int index)
     {
-        submitPlayer = TichuPlayerManager.GetAllPlayerWithTurn()[index];
-        Genealogy genealogy = GenealogyChekcer.CheckGenealogy(selectedCards);
+        submitPlayer = PlayerManager.GetAllPlayerWithTurn()[index];
+        Genealogy genealogy = GenealogyChekcer.Instance.CheckGenealogy(selectedCards);
         if(genealogy.genealogyType == GenealogyType.single && genealogy.rank == (int)Animal.phoenix)//피닉스
         {
             genealogy.rank = submitedGenealogy.rank + 0.5f;
@@ -34,8 +34,10 @@ public class SubmitManager : MonoBehaviour
         isDragon = false;
         cardList.ResetActive();
     }
-    public bool IsBoom(Genealogy newGenealogy)
+    public bool IsBoom(List<CardInfo> cardInfos)
     {
+        if (AnimalChecker.CheckAnimal(Animal.phoenix, cardInfos)) return false;
+        Genealogy newGenealogy = GenealogyChekcer.Instance.CheckGenealogy(cardInfos);
         if (newGenealogy.genealogyType == GenealogyType.fourOfKind)//바크탄
         {
             return submitedGenealogy.genealogyType != GenealogyType.straightFlush;

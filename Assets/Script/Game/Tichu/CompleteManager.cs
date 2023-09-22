@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CompleteManager : MonoBehaviour
 {
-   [SerializeField]  List<Player> completePlayers = new List<Player>();//
+    [SerializeField] TichuDeclareManager tichuDeclareManager;
+    [SerializeField]  List<Player> completePlayers = new List<Player>();//
     RoundType roundType = RoundType.notYet;
     public bool CheckComplete(Player player) { return completePlayers.Contains(player); }
     public bool IsFirstPlayer(Player player) { return completePlayers[0] == player; }
@@ -16,6 +17,18 @@ public class CompleteManager : MonoBehaviour
     public void Complete(Player currentPlayer)
     {
         Player player = currentPlayer;
+        if(completePlayers.Count == 0)
+        {
+            TichuPlayer tichuPlayer = (TichuPlayer)player;
+            if (tichuPlayer.Tichu == Tichu.noTichu)
+            {
+                if(tichuDeclareManager.HasTichu(Tichu.smallTichu) || tichuDeclareManager.HasTichu(Tichu.largeTichu)) PlayMusicOperator.Instance.PlayBGM("TichuFailed");
+            }
+            if(tichuPlayer.Tichu == Tichu.smallTichu)
+            {
+                if(tichuDeclareManager.HasTichu(Tichu.largeTichu) ) PlayMusicOperator.Instance.PlayBGM("TichuFailed");
+            }
+        }
         if (completePlayers.Count == 1) { if (completePlayers[0].Team == player.Team) { roundType = RoundType.oneTwo; } }
         if (completePlayers.Count == 2) { roundType = RoundType.roundOver; }
         completePlayers.Add(player);

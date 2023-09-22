@@ -9,7 +9,8 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [SerializeField] CardChecker cardChecker;
     [SerializeField] Submit submit;
     [Header("Manager")]
-    [SerializeField] CardDistributer cardDistributer;
+    [SerializeField] Popup dogAnimation;
+    [SerializeField] TichuCardDistributer cardDistributer;
     [SerializeField] TichuTurnManager turnManager;
     [SerializeField] ScoreManager scoreManager;
     [SerializeField] SubmitManager submitManager;
@@ -19,25 +20,26 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [SerializeField] PannelManager PannelManager;
     [SerializeField] SwapManager swapManager;
     [SerializeField] CallPannel callPannel;
-    [SerializeField] LanternManager lanternManager;
+    [SerializeField] TichuLanternManager lanternManager;
     [SerializeField] TichuVictoryManager victoryManager;
     [SerializeField] TichuModeManager modeManager;
     PhotonView PV;
+    bool isBirdFlag = false;
     private void Start() { PV = GetComponent<PhotonView>(); }
     #region Round
-    public void GameStart()
+    public void TryGameStart()
     {
         PV.RPC("GameIntailize", RpcTarget.All, SerializeManager.Serialize(cardDistributer.ResetTotalCardList()));
-        cardDistributer.FirstDistribute(TichuPlayerManager.GetAllPlayerWithTurn());
+        cardDistributer.FirstDistribute(PlayerManager.GetAllPlayerWithTurn());
         PV.RPC("AfterDistribute", RpcTarget.All, SerializeManager.Serialize(cardDistributer.TotalCardList), false);
     }
     void RoundStart()
     {
-        foreach (CardInfo cardInfo in TichuPlayerManager.GetPlayerOwn().HandCards)
+        foreach (CardInfo cardInfo in PlayerManager.GetPlayerOwn().HandCards)
         {
             if (cardInfo.number == 1)
             {
-                PV.RPC("SetStartTurn", RpcTarget.All, TichuPlayerManager.GetPlayerOwn().Index);
+                PV.RPC("SetStartTurn", RpcTarget.All, PlayerManager.GetPlayerOwn().Index);
             }
         }
     }
@@ -50,12 +52,12 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     public void TryCheckTIchu()
     {
 
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetPlayerOwn();
-        if (player.Tichu == Tichu.smallTichu) { PV.RPC("DeclareTichu", RpcTarget.All, TichuPlayerManager.GetPlayerOwn().Index); return; }
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetPlayerOwn();
+        if (player.Tichu == Tichu.smallTichu) { PV.RPC("DeclareTichu", RpcTarget.All, PlayerManager.GetPlayerOwn().Index); return; }
         if (tichuManager.IsAllDecideTichu())//티츄선언완료
         {
             PV.RPC("AfterAllTichuAction", RpcTarget.All);
-            cardDistributer.SecondDistribute(TichuPlayerManager.GetAllPlayerWithTurn());
+            cardDistributer.SecondDistribute(PlayerManager.GetAllPlayerWithTurn());
             PV.RPC("AfterDistribute", RpcTarget.All, SerializeManager.Serialize(cardDistributer.TotalCardList), true);
         }
     }
@@ -70,14 +72,14 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     #endregion
     #region Game
     public void TrySendDragon(int index, int score) { PV.RPC("SendDragon", RpcTarget.All, index, score); }
-    public void TrySubmit(bool isBirdStart)
+    public void TrySubmit()
     {
-        if (turnManager.IsMyTurn() || GenealogyChekcer.IsBomb(cardChecker.SelectedCards))
+        if (turnManager.IsMyTurn() || (GenealogyChekcer.Instance.IsBomb(cardChecker.SelectedCards) && !submitManager.IsFirst()))
         {
             if (!cardChecker.IsSelected()) return;//카드 선택됨 체커
-            if (callPannel.IsSetted() && !isBirdStart)//콜링 체커
+            if (callPannel.IsSetted() && !isBirdFlag)//콜링 체커
             {
-                if (callPannel.CheckCall(TichuPlayerManager.GetPlayerOwn().HandCards, submitManager.GetGenealogy()))//콜 걸렸는데 낼 수 있는데 패스하려함
+                if (callPannel.CheckCall(PlayerManager.GetPlayerOwn().HandCards, submitManager.GetGenealogy()))//콜을 낼 수 있음
                 {
                     if (!callPannel.CheckCall(cardChecker.SelectedCards, submitManager.GetGenealogy()))//콜 걸렸는데 딴거 내려함
                     {
@@ -90,30 +92,31 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
             //짹짹이
             if (AnimalChecker.CheckAnimal(Animal.bird, cardChecker.SelectedCards))
             {
-                if (callPannel.IsSetted()) { PV.RPC("Call", RpcTarget.All, callPannel.GetCall()); }
+                if (callPannel.IsSetted()) { PV.RPC("Call", RpcTarget.All, callPannel.GetCall()); isBirdFlag = false; }
                 else
                 {
                     callPannel.Toggle();
+                    isBirdFlag = true;
                     return;
                 }
             }
             //제출부
-            TichuPlayerManager.GetPlayerOwn().TryUseCard(cardChecker.SelectedCards);
-            PV.RPC("Submit", RpcTarget.All, SerializeManager.Serialize(cardChecker.SelectedCards), TichuPlayerManager.GetPlayerOwn().Index);
+            PlayerManager.GetPlayerOwn().TryUseCard(cardChecker.SelectedCards);
+            PV.RPC("Submit", RpcTarget.All, SerializeManager.Serialize(cardChecker.SelectedCards), PlayerManager.GetPlayerOwn().Index);
             //제출후 완주 확인
-            if (TichuPlayerManager.GetPlayerOwn().HandCards.Count == 0)
+            if (PlayerManager.GetPlayerOwn().HandCards.Count == 0)
             {
-                PV.RPC("Complete", RpcTarget.All, TichuPlayerManager.GetPlayerOwn().Index);
+                PV.RPC("Complete", RpcTarget.All, PlayerManager.GetPlayerOwn().Index);
 
                 if (victoryManager.IsEnd()) { return; }
                 if (completeManager.IsRoundOver())//모든 라운드 종료
                 {
-                    GameStart();//다음 라운드로
+                    TryGameStart();//다음 라운드로
                     return;
                 }
             }
             //댕댕이
-            if (AnimalChecker.CheckAnimal(Animal.dog, cardChecker.SelectedCards)) { PV.RPC("Dog", RpcTarget.All, TichuPlayerManager.GetPlayerOwn().Index); }
+            if (AnimalChecker.CheckAnimal(Animal.dog, cardChecker.SelectedCards)) { PV.RPC("Dog", RpcTarget.All, PlayerManager.GetPlayerOwn().Index); }
             //후속처리
             PannelManager.ActiveSmallTichuArea(false);
             cardChecker.HideCard();
@@ -129,7 +132,7 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
             if (submitManager.IsFirst()) return; //트릭 시작 플레이어 체커
             if (callPannel.IsSetted())//콜링 체커
             {
-                if (callPannel.CheckCall(TichuPlayerManager.GetPlayerOwn().HandCards, submitManager.GetGenealogy()))//콜 걸렸는데 낼 수 있는데 패스하려함
+                if (callPannel.CheckCall(PlayerManager.GetPlayerOwn().HandCards, submitManager.GetGenealogy()))//콜 걸렸는데 낼 수 있는데 패스하려함
                 {
                     callPannel.SetMessage(WanringType.pass);
                     return;
@@ -152,7 +155,7 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     {
         scoreManager.AddTemporaryScore(score, index); 
         PannelManager.ResetPannel(false);
-        if (TichuPlayerManager.GetPlayerOwn().HandCards.Count > 0) PannelManager.ActiveSubmitArea(true);
+        if (PlayerManager.GetPlayerOwn().HandCards.Count > 0) PannelManager.ActiveSubmitArea(true);
     }
     [PunRPC]
     void Call(int callRank)//티츄버튼에 할당 (모든 라지티츄 선언 후)
@@ -162,20 +165,21 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [PunRPC]
     void Dog(int index)
     {
-        if (DistanceCalculater.GetDistanceWithRoot(index, turnManager.GetCurrentPlayer()) == 1) turnManager.NextTurn();
+        dogAnimation.Toggle();
+        if (DistanceCalculater.GetDistanceWithRoot(index, turnManager.GetCurrentPlayer()) == (int)Direction.right) turnManager.NextTurn();
         submitManager.ResetAll();
     }
     [PunRPC]
     void AfterAllTichuAction()//티츄버튼에 할당 (모든 라지티츄 선언 후)
     {
         PannelManager.ActiveSendArea(true);
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetPlayerOwn();
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetPlayerOwn();
         if (player.Tichu != Tichu.largeTichu) PannelManager.ActiveSmallTichuArea(true);
         tichuManager.SetBackground(Tichu.noTichu);
         if (tichuManager.HasTichu(Tichu.largeTichu))
         {
             tichuManager.SetBackground(Tichu.largeTichu);
-            SoundEffecter.Instance.PlayEffect("largeTichu");
+            SoundEffecter.Instance.PlayEffect(SoundType.game,"largeTichu");
             foreach(CardDisplayer cardDisplayer in cardDisplayers)
             {
                 cardDisplayer.SetTichu();
@@ -187,12 +191,12 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     void AfterAllSwapAction()//스왑버튼에 할당 (모든 스왑 후)
     {
         PannelManager.ActiveSubmitArea(true);
-        TichuPlayer playerOwn = (TichuPlayer)TichuPlayerManager.GetPlayerOwn();
+        TichuPlayer playerOwn = (TichuPlayer)PlayerManager.GetPlayerOwn();
         if (playerOwn.Tichu == Tichu.noTichu) PannelManager.ActiveSmallTichuArea(true);
         swapManager.TogglePannel(false);
         swapManager.OpenPopup();
 
-        foreach (TichuPlayer player in TichuPlayerManager.GetAllPlayerWithTurn())
+        foreach (TichuPlayer player in PlayerManager.GetAllPlayerWithTurn())
         {
             foreach (CardReciever cardReciever in player.RecieveCard)
             {
@@ -235,12 +239,12 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [PunRPC]
     void DeclareTichu(int playerIndex)//스왑버튼에 할당
     {
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetAllPlayerWithTurn()[playerIndex];
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetAllPlayerWithTurn()[playerIndex];
         Tichu tichu = player.Tichu;
         if(tichu != Tichu.noTichu)
         {
             tichuManager.SetBackground(tichu);
-            SoundEffecter.Instance.PlayEffect(tichu.ToString()); ;
+            SoundEffecter.Instance.PlayEffect(SoundType.game, tichu.ToString()); ;
             int distance = DistanceCalculater.GetDistance(playerIndex);
             if (distance == 0) PannelManager.ActiveTichuLogo(tichu);
             else foreach(CardDisplayer cardDisplayer in cardDisplayers) { cardDisplayer.SetTichu(); }
@@ -257,6 +261,7 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
         callPannel.ResetCall();
         PannelManager.ResetPannel(true);
         lanternManager.ResetPassLanter();
+        PlayMusicOperator.Instance.ResetBgm();
         List<CardInfo> cardInfos = SerializeManager.Deserialize<List<CardInfo>>(selectedCard);
         cardDistributer.TotalCardList = cardInfos;
         PannelManager.ActiveLargeTichuArea(true);
@@ -264,7 +269,7 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [PunRPC]
     void SetStartTurn(int index)
     {
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetAllPlayerWithTurn()[index];
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetAllPlayerWithTurn()[index];
         turnManager.SetStartTurn(player.Index);
         submit.SetTurn(turnManager.IsMyTurn());
     }
@@ -273,13 +278,13 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     {
         lanternManager.ResetPassLanter();
         List<CardInfo> cardInfos = SerializeManager.Deserialize<List<CardInfo>>(selectedCard);
-        Genealogy genealogy = GenealogyChekcer.CheckGenealogy(cardInfos);
+        Genealogy genealogy = GenealogyChekcer.Instance.CheckGenealogy(cardInfos);
 
         //사운드
         if(callPannel.GetCall() != -99 && cardInfos.Find(x => x.number == 1) != null) SoundEffecter.Instance.PlayeEffectByResources(callPannel.GetCall() + "c");
         else SoundEffecter.Instance.PlayeEffectByResources(genealogy.rank + genealogy.genealogyType.ToString());
         //뿜
-        if (GenealogyChekcer.IsBomb(cardInfos))
+        if (GenealogyChekcer.Instance.IsBomb(cardInfos))
         {
             turnManager.SetStartTurn(index);
         }
@@ -293,7 +298,7 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [PunRPC]
     void Pass()
     {
-        SoundEffecter.Instance.PlayEffect("pass");
+        SoundEffecter.Instance.PlayEffect(SoundType.game, "pass");
         lanternManager.SetPassLantern(DistanceCalculater.GetDistance(turnManager.GetCurrentPlayer()), true);
         turnManager.NextTurn();
         if (turnManager.IsAllPass())
@@ -307,7 +312,7 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     [PunRPC]
     void Complete(int playerIndex)
     {
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetAllPlayerWithTurn()[playerIndex];
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetAllPlayerWithTurn()[playerIndex];
         completeManager.Complete(player);
         //turnManager.NextTurn();
         turnManager.SetStartTurn(turnManager.GetCurrentPlayer());
@@ -325,8 +330,8 @@ public class TichuGameManager : MonoBehaviour, IGameManagerInterface
     void SetDisplay()
     {
         submit.SetTurn(turnManager.IsMyTurn());
-        submit.SetBtn(submitManager.CheckCanSubmit(GenealogyChekcer.CheckGenealogy(cardChecker.SelectedCards)));
-        if (GenealogyChekcer.IsBomb(cardChecker.SelectedCards)) submit.ForceSetBtn();
+        submit.SetBtn(submitManager.CheckCanSubmit(GenealogyChekcer.Instance.CheckGenealogy(cardChecker.SelectedCards)));
+        if (GenealogyChekcer.Instance.IsBomb(cardChecker.SelectedCards)) submit.ForceSetBtn();
         foreach (CardDisplayer cardDisplayer in cardDisplayers) { cardDisplayer.SetCard(); }
     }
     #endregion

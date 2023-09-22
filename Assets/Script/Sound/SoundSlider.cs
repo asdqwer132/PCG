@@ -10,19 +10,14 @@ public class SoundSlider : MonoBehaviour
     [SerializeField] Slider slider;
     [SerializeField] string musicVolumeName;//
     [SerializeField] float bonus = 1f;
-    private void Start()
-    {
-        slider.value = PlayerPrefs.GetFloat(musicVolumeName, 0.75f);
-        SetLevel(slider.value);
-
-    }
     private void Update()
     {
-        SetLevel(slider.value);
+        SetLevel(false);
     }
-    public void SetLevel(float sliderValue)
+    public void SetLevel(bool isStart)
     {
-        mixer.SetFloat(musicVolumeName, Mathf.Log10(sliderValue) * 20 * bonus);
-        PlayerPrefs.SetFloat(musicVolumeName, sliderValue);
+        if(isStart) slider.value = PlayerPrefs.GetFloat(musicVolumeName, 0.75f);
+        mixer.SetFloat(musicVolumeName, Mathf.Log10(slider.value) * 20 * bonus);
+        PlayerPrefs.SetFloat(musicVolumeName, slider.value);
     }
 }

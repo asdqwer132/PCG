@@ -96,6 +96,17 @@ MonoBehaviour:
   - UseCardWithSwa
   - UseCardWithSwap
   - SortTeam
+  - Kick
+  - SetDisplayer
+  - DropCard
+  - ResetDropCards
+  - SetPlayerCard
+  - CardModify
+  - SetRon
+  - RoundInitalize
+  - SetScore
+  - SetNicknameByDisConnect
+  - SetHwaryo
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

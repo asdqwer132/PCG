@@ -42,13 +42,6 @@ public class CallPannel : Popup
     public bool CheckCall(List<CardInfo> cardInfos, Genealogy genealogy)
     {
         if (callRank == -99) return false;
-        if (GenealogyChekcer.CanMake4k(callRank, cardInfos)) return true;
-        if (GenealogyChekcer.CanMakeSF(callRank, cardInfos)) return true;
-        if (GenealogyChekcer.CheckMakeGenealogy(callRank, cardInfos, genealogy)) //낼 수 있다면
-        {
-            if(genealogy.genealogyType == GenealogyType.straight) return submitManager.CheckCanSubmit(GenealogyChekcer.CheckGenealogy(GenealogyChekcer.MakedStraight(callRank, genealogy.length, cardInfos)));
-            return submitManager.CheckCanSubmit(GenealogyChekcer.CheckGenealogy(GenealogyChekcer.MakedSingle(callRank, cardInfos)));
-        }
-        return false;
+        return GenealogyChekcer.Instance.CanMake(cardInfos, genealogy, callRank);
     }
 }

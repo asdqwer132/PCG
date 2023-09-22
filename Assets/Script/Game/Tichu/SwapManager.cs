@@ -10,12 +10,12 @@ public class SwapManager : MonoBehaviour
     [SerializeField] PannelManager pannelManager;
     public void OpenPopup()
     {
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetPlayerOwn();
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetPlayerOwn();
         popup.Setup(player.RecieveCard);
     }
     public bool IsAllSwap()
     {
-        foreach(TichuPlayer player in TichuPlayerManager.GetAllPlayerWithTurn())
+        foreach(TichuPlayer player in PlayerManager.GetAllPlayerWithTurn())
         {
             if (!player.IsAllSwap()) return false;
         }
@@ -39,10 +39,10 @@ public class SwapManager : MonoBehaviour
         if (cardChecker.SelectedCards.Count != 1) return;
         List<CardInfo> sendCard = cardChecker.SelectedCards;
         TichuPlayer player;
-        player = (TichuPlayer)TichuPlayerManager.GetPlayerOwn();
+        player = (TichuPlayer)PlayerManager.GetPlayerOwn();
         player.TryUseCardWithSwap(sendCard);
-        player = (TichuPlayer)TichuPlayerManager.GetPlayerWithDirection(index);
-        player.TryReceivieCard(sendCard, TichuPlayerManager.GetPlayerOwn().Index);
+        player = (TichuPlayer)PlayerManager.GetPlayerWithDirection(index);
+        player.TryReceivieCard(sendCard, PlayerManager.GetPlayerOwn().Index);
         cardChecker.HideCard();
         foreach (CardDisplayer displayer in cardDisplayers)
         {

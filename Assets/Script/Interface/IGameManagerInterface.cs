@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IGameManagerInterface
 {
-    void GameStart();
+    void TryGameStart();
 }

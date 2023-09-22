@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IVictoryManagerInteface
 {
-    void GameOver();
+    void EndGame();
 }

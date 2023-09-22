@@ -12,7 +12,7 @@ public class Submit : MonoBehaviour
     bool isMyTurn = false;
     public void SetTextByGenealogy(Genealogy genealogy, bool canGenealogy)
     {
-        string gemealogyText = genealogy.length > 0 ? NumberConverter.ConvertNum(genealogy.rank) + " " + genealogy.genealogyType : "";
+        string gemealogyText = genealogy.length > 0 ? NumberConverter.ConvertNum(genealogy.rank) + " " + NumberConverter.GenealogyConvert(genealogy.genealogyType) : "";
         btnText.text = gemealogyText;
         SetBtn(canGenealogy);
     }

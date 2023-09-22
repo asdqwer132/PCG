@@ -22,6 +22,13 @@ public class CardListDisplayer : MonoBehaviour
             cards[i].Setup(cardInfos[i]);
         }
     }
+    public void SetCardJustInfo(List<CardInfo> cardInfos)
+    {
+        for (int i = 0; i < cardInfos.Count; i++)
+        {
+            cards[i].Setup(cardInfos[i]);
+        }
+    }
     public void ResetAll()
     {
         for (int i = 0; i < cards.Count; i++)

@@ -19,8 +19,8 @@ public class ScoreManager : MonoBehaviour
     Dictionary<TichuPlayer, int> temporaryScore = new Dictionary<TichuPlayer, int>();
     public int GetTotalScore(Team team)
     {
-        if (team == Team.red) return redTotalScore;
-        if (team == Team.blue) return blueTotalScore;
+        if (team == Team.Red) return redTotalScore;
+        if (team == Team.Blue) return blueTotalScore;
         return -1;
     }
     private void Start()
@@ -52,18 +52,18 @@ public class ScoreManager : MonoBehaviour
     }
     public void AddTemporaryScore(int score,int playerIndex)
     {
-        TichuPlayer player = (TichuPlayer)TichuPlayerManager.GetAllPlayerWithTurn()[playerIndex];
+        TichuPlayer player = (TichuPlayer)PlayerManager.GetAllPlayerWithTurn()[playerIndex];
         temporaryScore[player] += score;
     }
     void CalculateTichu()
     {
-        foreach(TichuPlayer player in TichuPlayerManager.GetAllPlayerWithTurn())
+        foreach(TichuPlayer player in PlayerManager.GetAllPlayerWithTurn())
         {
             if(player.Tichu == Tichu.largeTichu || player.Tichu == Tichu.smallTichu)
             {
                 int score = player.Tichu == Tichu.largeTichu ? 200 : 100; 
-                if (player.Team == Team.red) redScore += completeManager.IsFirstPlayer(player) ? score : -score;
-                if (player.Team == Team.blue) blueScore += completeManager.IsFirstPlayer(player) ? score : -score;
+                if (player.Team == Team.Red) redScore += completeManager.IsFirstPlayer(player) ? score : -score;
+                if (player.Team == Team.Blue) blueScore += completeManager.IsFirstPlayer(player) ? score : -score;
             }
         }
         redTotalScore += redScore;
@@ -76,8 +76,8 @@ public class ScoreManager : MonoBehaviour
         if (completeManager.HowToEnd() == RoundType.oneTwo)
         {
             Debug.Log(completeManager.GetFirstPlayer().Team + "¿øÅõ ÆÀ");
-            if (completeManager.GetFirstPlayer().Team == Team.red) redScore += 200;
-            if (completeManager.GetFirstPlayer().Team == Team.blue) blueScore += 200;
+            if (completeManager.GetFirstPlayer().Team == Team.Red) redScore += 200;
+            if (completeManager.GetFirstPlayer().Team == Team.Blue) blueScore += 200;
         }
         else
         {
@@ -85,14 +85,14 @@ public class ScoreManager : MonoBehaviour
             {
                 if (completeManager.CheckComplete(entry.Key))
                 {
-                    if (entry.Key.Team == Team.red) redScore += entry.Value;
-                    if (entry.Key.Team == Team.blue) blueScore += entry.Value;
+                    if (entry.Key.Team == Team.Red) redScore += entry.Value;
+                    if (entry.Key.Team == Team.Blue) blueScore += entry.Value;
                 }
                 else
                 {
                     int lastScore = ScoreCalculater.CalculateScore(entry.Key.HandCards);
-                    if (entry.Key.Team == Team.red) blueScore += entry.Value + lastScore;
-                    if (entry.Key.Team == Team.blue) redScore += entry.Value + lastScore;
+                    if (entry.Key.Team == Team.Red) blueScore += entry.Value + lastScore;
+                    if (entry.Key.Team == Team.Blue) redScore += entry.Value + lastScore;
                 }
             }
         }

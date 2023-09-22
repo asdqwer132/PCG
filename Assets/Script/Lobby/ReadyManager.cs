@@ -15,7 +15,8 @@ public class ReadyManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI nickname;
     [SerializeField] Image readyBtn;
     [SerializeField] Image teamBtn;
-
+    public PhotonView GetPlayer() { return playerPV; }
+    public bool HasPlayer() { return player != null; }
     public bool IsReady()
     {
         if (player != null) return player.GetReady();
@@ -24,14 +25,10 @@ public class ReadyManager : MonoBehaviour
     private void Start()
     {
         PV = GetComponent<PhotonView>();
-        readyBtn.gameObject.GetComponent<Button>().interactable = false;
-        teamBtn.gameObject.GetComponent<Button>().interactable = false;
     }
     public void Setup(GameObject playerObj,int index)
     {
         this.index = index;
-        readyBtn.gameObject.GetComponent<Button>().interactable = true;
-        teamBtn.gameObject.GetComponent<Button>().interactable = true;
         playerPV = playerObj.GetPhotonView(); ;
         player = playerObj.GetComponent<LobbyPlayer>();
         nickname.text = playerPV.Owner.NickName;
@@ -54,13 +51,13 @@ public class ReadyManager : MonoBehaviour
         {
             if (player.GetTeam() == Team.random)
             {
-                player.TrySetTeam(Team.red);
+                player.TrySetTeam(Team.Red);
             }
-            else if (player.GetTeam() == Team.red)
+            else if (player.GetTeam() == Team.Red)
             {
-                player.TrySetTeam(Team.blue);
+                player.TrySetTeam(Team.Blue);
             }
-            else if (player.GetTeam() == Team.blue)
+            else if (player.GetTeam() == Team.Blue)
             {
                 player.TrySetTeam(Team.random);
             }

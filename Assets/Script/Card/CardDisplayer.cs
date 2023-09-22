@@ -18,7 +18,7 @@ public class CardDisplayer : MonoBehaviour
     {
         this.player = player;
         nicknameText.text = nickname;
-        nicknameText.color = player.Team == Team.red ? Color.red : Color.blue;
+        nicknameText.color = player.Team == Team.Red ? Color.red : Color.blue;
     }
     public void SetTichu()
     {

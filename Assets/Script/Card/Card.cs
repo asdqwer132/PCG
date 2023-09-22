@@ -6,10 +6,8 @@ using TMPro;
 
 public class Card : MonoBehaviour
 {
-    CardInfo cardInfo;
+    [SerializeField] CardInfo cardInfo;
     [SerializeField] Image cardFrame;
-    [SerializeField] Image cardTypeLogo;
-    [SerializeField] TextMeshProUGUI number;
 
     public CardInfo CardInfo { get => cardInfo; set => cardInfo = value; }
     public void Setup(CardInfo cardInfo)
